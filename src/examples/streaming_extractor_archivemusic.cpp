@@ -117,6 +117,7 @@ void compute(const string& audioFilename, const string& outputFilename, Pool& po
   computeStep4(pool, options);
   
   Pool stats = computeAggregation(pool, options);
+  //addSVMDescriptors(stats); // TODO not available yet
   
   // pre-trained classifiers are only available in branches devoted for that 
   // (eg: 2.0.1)
