@@ -17,15 +17,19 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#ifndef ESSENTIA_BINARYOPERATOR_H
-#define ESSENTIA_BINARYOPERATOR_H
+#ifndef ESSENTIA_BINARYOPERATORSTREAM_H
+#define ESSENTIA_BINARYOPERATORSTREAM_H
 
 #include "algorithm.h"
 
 namespace essentia {
 namespace standard {
 
-class BinaryOperator : public Algorithm {
+// TODO: This duplicates the code in UnaryOperatorStream, standard mode is redundant. 
+// We should have a native implementation of the streaming mode instead of 
+// wrapping code from standard mode.
+
+class BinaryOperatorStream : public Algorithm {
 
  protected:
   enum OpType {
@@ -44,7 +48,7 @@ class BinaryOperator : public Algorithm {
   OpType _type;
 
  public:
-  BinaryOperator() {
+  BinaryOperatorStream() {
     declareInput(_input1, "array1", "the first operand input array");
     declareInput(_input2, "array2", "the second operand input array");
     declareOutput(_output, "array", "the array containing the result of binary operation");
@@ -73,19 +77,24 @@ class BinaryOperator : public Algorithm {
 namespace essentia {
 namespace streaming {
 
-class BinaryOperator : public StreamingAlgorithmWrapper {
+class BinaryOperatorStream : public StreamingAlgorithmWrapper {
 
  protected:
-  Sink<std::vector<Real> > _input1;
-  Sink<std::vector<Real> > _input2;
-  Source<std::vector<Real> > _output;
+  Sink<Real> _input1;
+  Sink<Real> _input2;
+  Source<Real> _output;
+
+  static const int preferredSize = 4096;
 
  public:
-  BinaryOperator() {
-    declareAlgorithm("BinaryOperator");
-    declareInput(_input1, TOKEN, "array1");
-    declareInput(_input2, TOKEN, "array2");
-    declareOutput(_output, TOKEN, "array");
+  BinaryOperatorStream() {
+    declareAlgorithm("BinaryOperatorStream");
+    declareInput(_input1, STREAM, preferredSize, "array1");
+    declareInput(_input2, STREAM, preferredSize, "array2");
+    declareOutput(_output, STREAM, preferredSize, "array");
+    
+    _output.setBufferType(BufferUsage::forAudioStream);
+
   }
 };
 
@@ -93,4 +102,4 @@ class BinaryOperator : public StreamingAlgorithmWrapper {
 } // namespace essentia
 
 
-#endif // ESSENTIA_BINARYOPERATOR_H
+#endif // ESSENTIA_BINARYOPERATORSTREAM_H

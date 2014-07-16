@@ -17,26 +17,26 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#include "binaryoperator.h"
+#include "binaryoperatorstream.h"
 #include "essentiamath.h"
 #include <sstream>
 
 using namespace essentia;
 using namespace standard;
 
-const char* BinaryOperator::name = "BinaryOperator";
-const char* BinaryOperator::description = DOC("Given two vectors of Reals, this algorithm will perform basic arithmetical operations on it, element by element.\n"
+const char* BinaryOperatorStream::name = "BinaryOperatorStream";
+const char* BinaryOperatorStream::description = DOC("Given two vectors of Reals, this algorithm will perform basic arithmetical operations on it, element by element.\n"
 "Note:\n"
 "  - using this algorithm in streaming mode can cause diamond shape graphs which have not been tested with the current scheduler. There is NO GUARANTEE of its correct work for diamond shape graphs.\n"
 "  - for y<0, x/y is invalid");
 
-BinaryOperator::OpType BinaryOperator::typeFromString(const std::string& name) const {
+BinaryOperatorStream::OpType BinaryOperatorStream::typeFromString(const std::string& name) const {
   if (name == "add") return ADD;
   if (name == "subtract") return SUBTRACT;
   if (name == "multiply") return MULTIPLY;
   if (name == "divide") return DIVIDE;
 
-  throw EssentiaException("BinaryOperator: Unknown binary operator type: ", name);
+  throw EssentiaException("BinaryOperatorStream: Unknown binary operator type: ", name);
 }
 
 
@@ -47,14 +47,14 @@ BinaryOperator::OpType BinaryOperator::typeFromString(const std::string& name) c
   return;                               \
 }
 
-void BinaryOperator::compute() {
+void BinaryOperatorStream::compute() {
 
   const std::vector<Real>& input1 = _input1.get();
   const std::vector<Real>& input2 = _input2.get();
   std::vector<Real>& output = _output.get();
   
   if (input1.size() != input2.size()) {
-    throw EssentiaException("BinaryOperator: input vectors are not of equal size");
+    throw EssentiaException("BinaryOperatorStream: input vectors are not of equal size");
   }
   output.resize(input1.size());
 
@@ -89,7 +89,7 @@ void BinaryOperator::compute() {
       for (size_t i=0; i<input1.size(); ++i) {
         if (input2[i] < 0) {
           std::ostringstream e ;
-          e <<  "BinaryOperator: Divide by zero found in array position " << i;
+          e <<  "BinaryOperatorStream: Divide by zero found in array position " << i;
           throw EssentiaException(e);
         }
         output[i] = input1[i] / input2[i];
@@ -98,6 +98,6 @@ void BinaryOperator::compute() {
     }
   
   default:
-    throw EssentiaException("BinaryOperator: Unknown unary operator type");
+    throw EssentiaException("BinaryOperatorStream: Unknown unary operator type");
   }
 }
